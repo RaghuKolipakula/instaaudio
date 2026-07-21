@@ -15,7 +15,7 @@
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "InstaAudio",
-    "url": "https://instaaudio.app",
+    "url": "https://instaaudio.net",
     "description": "Free, private in-browser Instagram Reel audio extractor powered by WebAssembly. Extract clean MP3 audio from downloaded Reels or video clips directly on your device with zero cloud uploads.",
     "applicationCategory": "MultimediaApplication",
     "operatingSystem": "All",
@@ -241,22 +241,34 @@
         await ffmpeg.load();
       }
 
-      statusText.innerText = "Reading video memory...";
+      statusText.innerText = "Reading file into memory...";
       progressBar.style.width = '25%';
 
       const targetFormat = document.getElementById('formatSelect').value;
       const startTime = document.getElementById('startTime').value.trim();
       const endTime = document.getElementById('endTime').value.trim();
 
-      const inputName = `input_${Date.now()}`;
+      // Preserve input extension for virtual filesystem parsing
+      const inputExt = selectedFile.name.split('.').pop() || 'mp4';
+      const inputName = `input_${Date.now()}.${inputExt}`;
       const outputName = `output_${Date.now()}.${targetFormat}`;
 
       ffmpeg.FS('writeFile', inputName, await fetchFile(selectedFile));
 
-      let ffmpegArgs = ['-i', inputName, '-vn']; // -vn drops video stream, keeping audio only
+      // Build FFmpeg args with explicit audio codecs
+      let ffmpegArgs = ['-i', inputName, '-vn']; // -vn drops video stream
 
       if (startTime) ffmpegArgs.push('-ss', startTime);
       if (endTime) ffmpegArgs.push('-to', endTime);
+
+      // Map target format to explicit WASM-safe audio codec
+      if (targetFormat === 'mp3') {
+        ffmpegArgs.push('-acodec', 'libmp3lame', '-q:a', '2');
+      } else if (targetFormat === 'aac' || targetFormat === 'm4a') {
+        ffmpegArgs.push('-acodec', 'aac');
+      } else if (targetFormat === 'wav') {
+        ffmpegArgs.push('-acodec', 'pcm_s16le');
+      }
 
       ffmpegArgs.push(outputName);
 
@@ -267,10 +279,11 @@
 
       const data = ffmpeg.FS('readFile', outputName);
 
+      // Clean up virtual memory
       ffmpeg.FS('unlink', inputName);
       ffmpeg.FS('unlink', outputName);
 
-      const blob = new Blob([data.buffer], { type: `audio/${targetFormat}` });
+      const blob = new Blob([data.buffer], { type: `audio/${targetFormat === 'm4a' ? 'mp4' : targetFormat}` });
       const downloadUrl = URL.createObjectURL(blob);
 
       progressBar.style.width = '100%';
@@ -281,13 +294,13 @@
       dlBtn.download = `instaaudio_${selectedFile.name.split('.')[0]}.${targetFormat}`;
       dlBtn.className = 'btn';
       dlBtn.style.background = '#16a34a';
-      dlBtn.innerText = `💾 Download extracted .${targetFormat.toUpperCase()}`;
+      dlBtn.innerText = `💾 Download Extracted .${targetFormat.toUpperCase()}`;
 
       downloadContainer.appendChild(dlBtn);
 
     } catch (err) {
-      console.error(err);
-      statusText.innerText = "Error extracting audio. Please check format or timestamps.";
+      console.error("FFmpeg Error:", err);
+      statusText.innerText = "Error extracting audio. Please try an MP4/MOV video clip.";
     } finally {
       convertBtn.disabled = false;
     }
