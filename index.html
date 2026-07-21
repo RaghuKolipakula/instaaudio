@@ -202,7 +202,13 @@
 
 <script>
   const { createFFmpeg, fetchFile } = FFmpeg;
-  let ffmpeg = null;
+  
+  // Explicitly point to single-threaded core binary to prevent SharedArrayBuffer locks
+  let ffmpeg = createFFmpeg({ 
+    log: true,
+    corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
+  });
+  
   let selectedFile = null;
 
   document.getElementById('videoInput').addEventListener('change', (e) => {
@@ -229,39 +235,37 @@
     statusText.innerText = "Loading WebAssembly Processing Engine...";
 
     try {
-      if (!ffmpeg) {
-        ffmpeg = createFFmpeg({ log: false });
-        ffmpeg.setProgress(({ ratio }) => {
-          let percent = Math.min(Math.floor(ratio * 100), 100);
-          if (percent > 0) {
-            progressBar.style.width = percent + '%';
-            statusText.innerText = `Extracting Audio... ${percent}%`;
-          }
-        });
+      if (!ffmpeg.isLoaded()) {
+        statusText.innerText = "Downloading WebAssembly Core (~25MB)...";
         await ffmpeg.load();
       }
 
       statusText.innerText = "Reading file into memory...";
       progressBar.style.width = '25%';
 
+      ffmpeg.setProgress(({ ratio }) => {
+        let percent = Math.min(Math.floor(ratio * 100), 100);
+        if (percent > 0) {
+          progressBar.style.width = percent + '%';
+          statusText.innerText = `Extracting Audio... ${percent}%`;
+        }
+      });
+
       const targetFormat = document.getElementById('formatSelect').value;
       const startTime = document.getElementById('startTime').value.trim();
       const endTime = document.getElementById('endTime').value.trim();
 
-      // Preserve input extension for virtual filesystem parsing
       const inputExt = selectedFile.name.split('.').pop() || 'mp4';
       const inputName = `input_${Date.now()}.${inputExt}`;
       const outputName = `output_${Date.now()}.${targetFormat}`;
 
       ffmpeg.FS('writeFile', inputName, await fetchFile(selectedFile));
 
-      // Build FFmpeg args with explicit audio codecs
-      let ffmpegArgs = ['-i', inputName, '-vn']; // -vn drops video stream
+      let ffmpegArgs = ['-i', inputName, '-vn'];
 
       if (startTime) ffmpegArgs.push('-ss', startTime);
       if (endTime) ffmpegArgs.push('-to', endTime);
 
-      // Map target format to explicit WASM-safe audio codec
       if (targetFormat === 'mp3') {
         ffmpegArgs.push('-acodec', 'libmp3lame', '-q:a', '2');
       } else if (targetFormat === 'aac' || targetFormat === 'm4a') {
@@ -279,7 +283,6 @@
 
       const data = ffmpeg.FS('readFile', outputName);
 
-      // Clean up virtual memory
       ffmpeg.FS('unlink', inputName);
       ffmpeg.FS('unlink', outputName);
 
@@ -299,8 +302,8 @@
       downloadContainer.appendChild(dlBtn);
 
     } catch (err) {
-      console.error("FFmpeg Error:", err);
-      statusText.innerText = "Error extracting audio. Please try an MP4/MOV video clip.";
+      console.error("FFmpeg Execution Error:", err);
+      statusText.innerText = "Error processing file. Please check console or try a standard MP4 file.";
     } finally {
       convertBtn.disabled = false;
     }
