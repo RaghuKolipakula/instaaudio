@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InstaAudio — Free Instagram Reel Audio Extractor & MP3 Converter</title>
+  <meta name="description" content="Extract clean MP3 audio from Instagram Reels and video clips instantly in your browser. Free client-side Instagram audio extractor with zero cloud uploads and total privacy.">
+
+  <!-- Favicon Icon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'><rect x='2' y='2' width='20' height='20' rx='5' stroke='%23ec4899' stroke-width='2'/><path d='M12 8v8M8 12h8' stroke='%23e11d48' stroke-width='2' stroke-linecap='round'/></svg>">
+
+  <!-- JSON-LD STRUCTURED DATA SCHEMA FOR GOOGLE SEARCH -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "InstaAudio",
+    "url": "https://instaaudio.app",
+    "description": "Free, private in-browser Instagram Reel audio extractor powered by WebAssembly. Extract clean MP3 audio from downloaded Reels or video clips directly on your device with zero cloud uploads.",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript and HTML5 WebAssembly support",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+
+  <!-- FFmpeg.wasm WebAssembly Libraries -->
+  <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+
+  <!-- GOOGLE ADSENSE MONETIZATION SCRIPT -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5197654798298236" crossorigin="anonymous"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 1rem; }
+    .card { background: #1e293b; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 100%; max-width: 520px; text-align: center; margin-top: 2rem; }
+    
+    /* Instagram Gradient Branding */
+    .brand-title {
+      background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin: 0;
+    }
+    .btn { background: linear-gradient(135deg, #e6683c 0%, #dc2743 50%, #cc2366 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1rem; width: 100%; margin-top: 1rem; display: block; text-decoration: none; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.9; }
+    .btn:disabled { background: #475569; cursor: not-allowed; -webkit-text-fill-color: white; opacity: 0.6; }
+    .file-label { display: block; padding: 2rem; border: 2px dashed #475569; border-radius: 8px; cursor: pointer; color: #94a3b8; transition: border 0.2s; }
+    .file-label:hover { border-color: #ec4899; color: #f8fafc; }
+    input[type="file"] { display: none; }
+    .control-group { margin-top: 1.25rem; text-align: left; background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid #334155; }
+    .control-group label { display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.4rem; }
+    .control-group select, .control-group input { width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #475569; background: #1e293b; color: #f8fafc; font-size: 0.9rem; }
+    .trim-row { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+    .progress-bar-container { background: #0f172a; border-radius: 6px; height: 12px; width: 100%; margin-top: 1rem; overflow: hidden; display: none; }
+    .progress-bar { background: linear-gradient(90deg, #f09433, #dc2743, #bc1888); height: 100%; width: 0%; transition: width 0.2s; }
+    .status { margin-top: 0.75rem; font-size: 0.85rem; color: #94a3b8; }
+    .ad-zone { margin-top: 1.5rem; min-height: 90px; background: #0f172a; border-radius: 6px; border: 1px dashed #334155; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #64748b; }
+    
+    /* Content & Footer styling for AdSense Approval */
+    .seo-section { max-width: 650px; margin: 3rem auto 1.5rem; padding: 0 1rem; color: #94a3b8; font-size: 0.95rem; line-height: 1.6; text-align: left; }
+    .seo-section h2 { color: #f8fafc; font-size: 1.25rem; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
+    .seo-section h3 { color: #e2e8f0; font-size: 1.05rem; margin-top: 1.5rem; }
+    .seo-section ul, .seo-section ol { padding-left: 1.2rem; }
+    footer { text-align: center; padding: 2rem 1rem; color: #64748b; font-size: 0.85rem; width: 100%; border-top: 1px solid #1e293b; margin-top: auto; }
+    footer a { color: #ec4899; text-decoration: none; cursor: pointer; margin: 0 0.5rem; }
+    
+    /* Modal Styling for Privacy / Terms */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; padding: 1rem; z-index: 100; }
+    .modal-content { background: #1e293b; padding: 2rem; border-radius: 12px; max-width: 600px; max-height: 80vh; overflow-y: auto; color: #94a3b8; font-size: 0.9rem; text-align: left; }
+    .modal-content h3 { color: #f8fafc; margin-top: 0; }
+    .close-btn { background: #475569; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; float: right; }
+  </style>
+</head>
+<body>
+
+<!-- MAIN TOOL CARD -->
+<div class="card">
+  <!-- Brand Header -->
+  <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="2" width="20" height="20" rx="5" stroke="url(#ig-grad)" stroke-width="2.5"/>
+      <circle cx="12" cy="12" r="4" stroke="url(#ig-grad)" stroke-width="2.5"/>
+      <circle cx="17.5" cy="6.5" r="1.5" fill="#e11d48"/>
+      <defs>
+        <linearGradient id="ig-grad" x1="2" y1="22" x2="22" y2="2" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#f09433"/>
+          <stop offset="0.25" stop-color="#e6683c"/>
+          <stop offset="0.5" stop-color="#dc2743"/>
+          <stop offset="0.75" stop-color="#cc2366"/>
+          <stop offset="1" stop-color="#bc1888"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <h1 class="brand-title">InstaAudio</h1>
+  </div>
+  <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 0;">Extract MP3 audio from Instagram Reels & videos. Zero cloud uploads.</p>
+
+  <!-- File Upload Area -->
+  <label for="videoInput" class="file-label" id="fileLabel">🎵 Drop or click to select Reel or MP4 clip</label>
+  <input type="file" id="videoInput" accept="video/*,audio/*">
+
+  <!-- Audio Controls Section -->
+  <div id="controlsSection" style="display:none;">
+    <!-- Output Format Selector -->
+    <div class="control-group">
+      <label for="formatSelect">Target Audio Format:</label>
+      <select id="formatSelect">
+        <option value="mp3">MP3 (Universal Audio)</option>
+        <option value="aac">AAC (Compact Audio)</option>
+        <option value="m4a">M4A (Apple Audio)</option>
+        <option value="wav">WAV (Uncompressed)</option>
+      </select>
+    </div>
+
+    <!-- Optional Audio Trimmer -->
+    <div class="control-group">
+      <label>Optional Sound Byte Trimming (HH:MM:SS or Seconds):</label>
+      <div class="trim-row">
+        <input type="text" id="startTime" placeholder="Start: e.g. 00:00:00">
+        <input type="text" id="endTime" placeholder="End: e.g. 00:00:15">
+      </div>
+    </div>
+
+    <!-- Convert Button -->
+    <button class="btn" id="convertBtn" onclick="processAudio()">⚡ Extract Reel Audio</button>
+  </div>
+
+  <!-- Progress Bar & Status -->
+  <div class="progress-bar-container" id="progressContainer">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  <div class="status" id="statusText"></div>
+
+  <!-- Download Container -->
+  <div id="downloadContainer" style="margin-top: 1rem;"></div>
+
+  <!-- Auto Ads Placement Area -->
+  <div class="ad-zone" id="adZone">
+    <span>SPONSORED CONTENT</span>
+  </div>
+</div>
+
+<!-- TEXT CONTENT AREA (Prevents "Low Value Content" AdSense Rejection) -->
+<section class="seo-section">
+  <h2>Fast, Private Instagram Reel Audio Extraction</h2>
+  <p>InstaAudio is an in-browser audio extractor tailored for content creators, video editors, and social media managers. Powered by WebAssembly (FFmpeg.wasm), InstaAudio lets you isolate, extract, and trim clean MP3 audio tracks from Instagram Reels, TikTok videos, and MP4 clips directly inside your device's browser memory.</p>
+
+  <h3>Why Use InstaAudio?</h3>
+  <ul>
+    <li><strong>100% Client-Side Privacy:</strong> Video files are processed locally on your phone or computer CPU. Your media clips never touch an external server or cloud storage bucket.</li>
+    <li><strong>Extract Trending Sound Bytes:</strong> Grab trending background songs, dialogue, and audio clips from saved Reels to reuse in your own video edits.</li>
+    <li><strong>Precision Sound Trimming:</strong> Extract exact audio segments or sound bites by specifying start and end timestamps.</li>
+  </ul>
+
+  <h3>How to Extract Audio from Instagram Videos</h3>
+  <ol>
+    <li>Download or save your desired Instagram Reel / video clip to your phone or computer.</li>
+    <li>Select the clip in InstaAudio using the file selector above.</li>
+    <li>Choose your target format (MP3, AAC, M4A, or WAV).</li>
+    <li>Optionally set start and end timestamps to isolate a specific sound byte.</li>
+    <li>Click "Extract Reel Audio" to generate your instant high-quality audio download.</li>
+  </ol>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>&copy; 2026 InstaAudio — Private Client-Side Instagram Utilities.</p>
+  <p>
+    <a onclick="openModal('privacyModal')">Privacy Policy</a> | 
+    <a onclick="openModal('termsModal')">Terms of Service</a>
+  </p>
+</footer>
+
+<!-- PRIVACY POLICY MODAL -->
+<div class="modal" id="privacyModal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closeModal('privacyModal')">Close</button>
+    <h3>Privacy Policy</h3>
+    <p>At InstaAudio, we prioritize your data privacy. InstaAudio operates using client-side WebAssembly technology.</p>
+    <p><strong>File Data:</strong> We do not store, upload, inspect, or retain any video or audio files on external servers. All processing executes locally inside your browser memory.</p>
+    <p><strong>Cookies & Advertising:</strong> We use Google AdSense to serve advertisements. Google uses cookies to serve ads based on prior visits. You can opt out of personalized advertising by visiting Google's Ad Settings.</p>
+  </div>
+</div>
+
+<!-- TERMS OF SERVICE MODAL -->
+<div class="modal" id="termsModal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closeModal('termsModal')">Close</button>
+    <h3>Terms of Service</h3>
+    <p>By using InstaAudio, you agree to these Terms of Service.</p>
+    <p><strong>Usage Rules:</strong> You agree to use InstaAudio only for video files you own or have lawful rights to extract audio from. InstaAudio is provided on an "AS IS" basis without warranties of any kind regarding speed or browser compatibility.</p>
+  </div>
+</div>
+
+<script>
+  const { createFFmpeg, fetchFile } = FFmpeg;
+  let ffmpeg = null;
+  let selectedFile = null;
+
+  document.getElementById('videoInput').addEventListener('change', (e) => {
+    selectedFile = e.target.files[0];
+    if (selectedFile) {
+      document.getElementById('fileLabel').innerText = `Selected: ${selectedFile.name} (${(selectedFile.size / 1024 / 1024).toFixed(1)} MB)`;
+      document.getElementById('controlsSection').style.display = 'block';
+    }
+  });
+
+  async function processAudio() {
+    if (!selectedFile) return;
+
+    const convertBtn = document.getElementById('convertBtn');
+    const statusText = document.getElementById('statusText');
+    const progressBar = document.getElementById('progressBar');
+    const progressContainer = document.getElementById('progressContainer');
+    const downloadContainer = document.getElementById('downloadContainer');
+
+    convertBtn.disabled = true;
+    downloadContainer.innerHTML = '';
+    progressContainer.style.display = 'block';
+    progressBar.style.width = '10%';
+    statusText.innerText = "Loading WebAssembly Processing Engine...";
+
+    try {
+      if (!ffmpeg) {
+        ffmpeg = createFFmpeg({ log: false });
+        ffmpeg.setProgress(({ ratio }) => {
+          let percent = Math.min(Math.floor(ratio * 100), 100);
+          if (percent > 0) {
+            progressBar.style.width = percent + '%';
+            statusText.innerText = `Extracting Audio... ${percent}%`;
+          }
+        });
+        await ffmpeg.load();
+      }
+
+      statusText.innerText = "Reading video memory...";
+      progressBar.style.width = '25%';
+
+      const targetFormat = document.getElementById('formatSelect').value;
+      const startTime = document.getElementById('startTime').value.trim();
+      const endTime = document.getElementById('endTime').value.trim();
+
+      const inputName = `input_${Date.now()}`;
+      const outputName = `output_${Date.now()}.${targetFormat}`;
+
+      ffmpeg.FS('writeFile', inputName, await fetchFile(selectedFile));
+
+      let ffmpegArgs = ['-i', inputName, '-vn']; // -vn drops video stream, keeping audio only
+
+      if (startTime) ffmpegArgs.push('-ss', startTime);
+      if (endTime) ffmpegArgs.push('-to', endTime);
+
+      ffmpegArgs.push(outputName);
+
+      statusText.innerText = "Encoding audio stream...";
+      progressBar.style.width = '40%';
+
+      await ffmpeg.run(...ffmpegArgs);
+
+      const data = ffmpeg.FS('readFile', outputName);
+
+      ffmpeg.FS('unlink', inputName);
+      ffmpeg.FS('unlink', outputName);
+
+      const blob = new Blob([data.buffer], { type: `audio/${targetFormat}` });
+      const downloadUrl = URL.createObjectURL(blob);
+
+      progressBar.style.width = '100%';
+      statusText.innerText = "Audio Extraction Complete!";
+
+      const dlBtn = document.createElement('a');
+      dlBtn.href = downloadUrl;
+      dlBtn.download = `instaaudio_${selectedFile.name.split('.')[0]}.${targetFormat}`;
+      dlBtn.className = 'btn';
+      dlBtn.style.background = '#16a34a';
+      dlBtn.innerText = `💾 Download extracted .${targetFormat.toUpperCase()}`;
+
+      downloadContainer.appendChild(dlBtn);
+
+    } catch (err) {
+      console.error(err);
+      statusText.innerText = "Error extracting audio. Please check format or timestamps.";
+    } finally {
+      convertBtn.disabled = false;
+    }
+  }
+
+  function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+</script>
+
+</body>
+</html>
