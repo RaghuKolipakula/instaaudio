@@ -44,8 +44,6 @@
   <!-- FFmpeg.wasm WebAssembly Libraries -->
   <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
 
-  <!-- GOOGLE ADSENSE MONETIZATION SCRIPT -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5197654798298236" crossorigin="anonymous"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -155,31 +153,35 @@
   <!-- Download Container -->
   <div id="downloadContainer" style="margin-top: 1rem;"></div>
 
-  <!-- Auto Ads Placement Area -->
-  <div class="ad-zone" id="adZone">
-    <span>SPONSORED CONTENT</span>
-  </div>
 </div>
 
 <!-- TEXT CONTENT AREA (Prevents "Low Value Content" AdSense Rejection) -->
 <section class="seo-section">
   <h2>Fast, Private Instagram Reel Audio Extraction</h2>
-  <p>InstaAudio is an in-browser audio extractor tailored for content creators, video editors, and social media managers. Powered by WebAssembly (FFmpeg.wasm), InstaAudio lets you isolate, extract, and trim clean MP3 audio tracks from Instagram Reels, TikTok videos, and MP4 clips directly inside your device's browser memory.</p>
+  <p>InstaAudio is an in-browser audio extractor tailored for content creators, video editors, and social media managers. Powered by WebAssembly (FFmpeg.wasm), InstaAudio lets you isolate, extract, and trim clean MP3 audio tracks from Instagram Reels, TikTok videos, and MP4 clips directly inside your device's browser memory. Unlike traditional online converters that force you to upload your personal videos to their servers, InstaAudio processes everything locally. This means no waiting for uploads, no waiting in server queues, and absolute privacy for your media.</p>
+
+  <p>The landscape of content creation is heavily driven by trending audio. From viral dances to comedic soundbites, having the right audio track can significantly boost engagement on platforms like Instagram, TikTok, and YouTube Shorts. However, extracting that perfect audio clip from a downloaded video can be tedious. You typically have to open a heavy desktop application like Premiere Pro or Final Cut, import the video, unlink the audio, trim it, and export it. InstaAudio simplifies this entire workflow into a few clicks right inside your web browser.</p>
 
   <h3>Why Use InstaAudio?</h3>
   <ul>
-    <li><strong>100% Client-Side Privacy:</strong> Video files are processed locally on your phone or computer CPU. Your media clips never touch an external server or cloud storage bucket.</li>
-    <li><strong>Extract Trending Sound Bytes:</strong> Grab trending background songs, dialogue, and audio clips from saved Reels to reuse in your own video edits.</li>
-    <li><strong>Precision Sound Trimming:</strong> Extract exact audio segments or sound bites by specifying start and end timestamps.</li>
+    <li><strong>100% Client-Side Privacy:</strong> Video files are processed locally on your phone or computer CPU. Your media clips never touch an external server or cloud storage bucket. If you are a journalist working with sensitive footage, or just someone who values their privacy, you can use InstaAudio with the confidence that your data is not being harvested or analyzed by third-party servers.</li>
+    <li><strong>Zero Upload Bottlenecks:</strong> Because the processing happens on your device, you are not constrained by your internet upload speed. Extracting audio from a 1GB 4K video file is just as fast as extracting from a 10MB clip, because the data never has to travel across the internet.</li>
+    <li><strong>Extract Trending Sound Bytes:</strong> Grab trending background songs, dialogue, and audio clips from saved Reels to reuse in your own video edits seamlessly. Build your own library of sound effects and memes without relying on generic stock audio.</li>
+    <li><strong>Precision Sound Trimming:</strong> Extract exact audio segments or sound bites by specifying start and end timestamps. You don't have to download the whole 3-minute song if you only need the 15-second chorus drop.</li>
+    <li><strong>Format Flexibility:</strong> Export to the format you need. MP3 for universal compatibility, AAC and M4A for Apple ecosystem workflows, or WAV for completely lossless, uncompressed studio-quality audio.</li>
   </ul>
+  
+  <h3>The Power of WebAssembly and FFmpeg</h3>
+  <p>The magic behind InstaAudio is WebAssembly (Wasm). Historically, web browsers could only run JavaScript, which isn't fast enough for heavy computational tasks like video and audio decoding. WebAssembly allows developers to compile code written in languages like C and C++ and run it in the browser at near-native speeds.</p>
+  <p>InstaAudio uses a WebAssembly port of FFmpeg, the industry-standard, open-source multimedia framework. By running FFmpeg directly in your browser, InstaAudio harnesses professional-grade audio extraction capabilities without requiring you to install any software or use command-line interfaces. It's the perfect fusion of powerful backend technology with an accessible frontend user interface.</p>
 
   <h3>How to Extract Audio from Instagram Videos</h3>
   <ol>
-    <li>Download or save your desired Instagram Reel / video clip to your phone or computer.</li>
+    <li>Download or save your desired Instagram Reel / video clip to your phone or computer. Note: InstaAudio requires you to have the video file saved locally.</li>
     <li>Select the clip in InstaAudio using the file selector above.</li>
-    <li>Choose your target format (MP3, AAC, M4A, or WAV).</li>
-    <li>Optionally set start and end timestamps to isolate a specific sound byte.</li>
-    <li>Click "Extract Reel Audio" to generate your instant high-quality audio download.</li>
+    <li>Choose your target format (MP3, AAC, M4A, or WAV). If you're unsure, MP3 is the most universally supported format.</li>
+    <li>Optionally set start and end timestamps (e.g., 00:00:15) to isolate a specific sound byte.</li>
+    <li>Click "Extract Reel Audio". The WebAssembly engine will quickly process the file and generate an instant high-quality audio download.</li>
   </ol>
 </section>
 
@@ -187,6 +189,7 @@
 <footer>
   <p>&copy; 2026 InstaAudio — Private Client-Side Instagram Utilities.</p>
   <p>
+    <a href="/docs/index.html">Documentation & Blog</a> | 
     <a onclick="openModal('privacyModal')">Privacy Policy</a> | 
     <a onclick="openModal('termsModal')">Terms of Service</a>
   </p>
