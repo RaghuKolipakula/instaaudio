@@ -20,8 +20,8 @@ export default {
       const slug = row.query.toLowerCase().replace(/\\s+/g, '-');
       
       const prompt = `
-        You are an expert SEO copywriter. A user is looking for an audio processing tool related to: "${row.query}".
-        Our tool is a browser-based Audio/Video Processor that can overlay audio on an image, scale background music, and export MP4.
+        You are an expert SEO copywriter. A user is an Instagram content creator or audio producer looking for a tool related to: "${row.query}".
+        Our tool is a browser-based Audio/Video Processor that can overlay audio on an image, scale background music, and export an MP4 perfect for Instagram Reels or Stories.
         Create an SEO-optimized headline and a short promotional copy paragraph that directly addresses their problem and explains how our tool solves it natively in the browser without server uploads.
         Return ONLY valid JSON in this exact format:
         { "headline": "...", "copy": "..." }

@@ -10,8 +10,8 @@ export default {
     }
 
     const prompt = `
-      Search Google and Reddit (r/audioengineering, r/podcasting, r/VideoEditing) for recent questions and complaints about audio processing.
-      Identify 3 specific, missing utility tools or common pain points users are having (e.g. "remove wind noise iPhone", "m4a to wav volume loss").
+      Search Google and Reddit (r/Instagram, r/InstagramMarketing, r/reels, r/VideoEditing, r/musicproduction) for recent questions, complaints, or workflows regarding audio processing, trending audio, and video editing specifically for Instagram users and music producers.
+      Identify 3 specific, missing utility tools or common pain points users are having (e.g. "remove background noise from instagram reel", "make beat drop hit harder for reels").
       Output ONLY a JSON array of strings containing the exact search terms someone might use to find a tool for these problems.
     `;
 
