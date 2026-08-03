@@ -1,0 +1,14 @@
+name = "audio-ai-mab-worker"
+main = "src/index.js"
+compatibility_date = "2024-03-20"
+
+[triggers]
+crons = ["0 * * * *"] # Run every hour
+
+[[d1_databases]]
+binding = "DB"
+database_name = "audio-db"
+database_id = "00000000-0000-0000-0000-000000000000"
+
+# [vars]
+# GEMINI_API_KEY = "..."
