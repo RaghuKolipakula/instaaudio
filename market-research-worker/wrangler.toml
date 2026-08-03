@@ -3,7 +3,7 @@ main = "src/index.js"
 compatibility_date = "2024-03-20"
 
 [triggers]
-crons = ["0 0 * * 0"] # Run weekly on Sunday at midnight
+crons = ["0 0 * * *"] # Run daily at midnight
 
 [[d1_databases]]
 binding = "DB"
