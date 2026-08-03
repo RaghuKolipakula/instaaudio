@@ -8,7 +8,7 @@ crons = ["0 * * * *"] # Run every hour
 [[d1_databases]]
 binding = "DB"
 database_name = "audio-db"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "478ffd20-05b6-4381-a863-d88508e8c87e"
 
 # [vars]
 # GEMINI_API_KEY = "..."
